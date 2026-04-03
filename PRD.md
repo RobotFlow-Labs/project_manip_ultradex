@@ -1,88 +1,100 @@
-# RAIJIN: UltraDexGrasp: Bimanual Dexterous Grasping — Implementation PRD
-## ANIMA Wave-7 Module #4
+# MANIP-ULTRADEX — Implementation PRD
 
-**Status:** Scaffold
-**Version:** 0.1
-**Date:** 2026-04-03
-**Paper:** UltraDexGrasp: Bimanual Dexterous Grasping
-**Paper Link:** https://arxiv.org/abs/2503.13300
-**Repo:** https://github.com/InternRobotics/UltraDexGrasp
-**Compute:** GPU-NEED
-**Functional Name:** MANIP-ultradex
+**Status:** Planning complete, implementation not started  
+**Version:** 0.2  
+**Date:** 2026-04-03  
+**Paper:** UltraDexGrasp: Learning Universal Dexterous Grasping for Bimanual Robots with Synthetic Data  
+**Paper Link:** https://arxiv.org/abs/2603.05312  
+**Repo:** https://github.com/InternRobotics/UltraDexGrasp  
+**Functional Name:** MANIP-ultradex  
 **Stack:** PROMETHEUS
 
-## 1. Executive Summary
-(TODO — fill after reading paper)
+## Executive Summary
 
-## 2. Paper Verification Status
-- [x] ArXiv ID verified (Kill Protocol V2)
-- [x] GitHub repo confirmed accessible
-- [ ] Paper read completely
-- [ ] Reference repo cloned and tested
-- [ ] Datasets confirmed accessible
-- [ ] Metrics appear reproducible
-- [ ] No red flags found
-- **Verdict:** PENDING
+MANIP-ULTRADEX reproduces the UltraDexGrasp paper as an ANIMA manipulation module for universal dexterous grasping with bimanual robots. The paper combines two deliverables:
 
-## 3. What We Take From The Paper
-(TODO)
+1. A synthetic data pipeline that generates multi-strategy bimanual grasp demonstrations through optimization-based grasp synthesis plus planning-based rollout.
+2. A point-cloud policy that consumes 2,048 scene points, aggregates features with a decoder-only transformer and unidirectional attention, and predicts dual-arm plus dual-hand control commands.
 
-## 4. What We Skip
-(TODO)
+The public repo only exposes the rollout and asset-generation side. The PRD suite below therefore plans both:
 
-## 5. What We Adapt
-(TODO)
+- faithful wrapping of the released BODex plus cuRobo rollout stack
+- reconstruction of the unpublished training and inference stack from the paper
 
-## 6. Architecture
-(TODO — module design, inputs, outputs, interfaces)
+## Paper Verification Status
 
-## 7. Implementation Phases
+- [x] Correct paper identified as `arXiv:2603.05312`
+- [x] Correct paper downloaded to `papers/2603.05312_UltraDexGrasp.pdf`
+- [x] Public reference repo inspected in `repositories/UltraDexGrasp/`
+- [x] Mismatch detected: local `2503.13300` PDF is unrelated and should not drive implementation
+- [ ] Third-party dependencies bootstrapped locally
+- [ ] Reference rollout executed successfully
+- [ ] Training split metadata recreated locally
+- [ ] Policy training stack rebuilt and benchmarked
 
-### Phase 1 — Scaffold + Verification ⬜
-- [x] Project structure created
-- [ ] Reference repo cloned to /Volumes/AIFlowDev/RobotFlowLabs/repos/wave7
-- [ ] Demo/inference tested on reference data
-- [ ] Paper claims verified on their benchmark
+## What We Take From The Paper
 
-### Phase 2 — Reproduce on Reference Dataset ⬜
-- [ ] Core method implemented
-- [ ] Train/eval on paper's dataset
-- [ ] Match paper metrics (within ±5%)
+- The exact two-stage system decomposition: optimization-based grasp synthesis and planning-based demonstration generation.
+- The multi-strategy grasp framing: two-finger pinch, three-finger tripod, whole-hand, and bimanual grasp.
+- The policy IO contract: 2,048-point cloud input, PointNet++ style point encoder, decoder-only transformer, action queries, unidirectional attention, and bounded Gaussian action prediction.
+- The benchmark targets from Table I, Table II, and Table III.
+- The real-world embodiment assumptions: 2x UR5e, 2x XHand, 2x Azure Kinect DK.
 
-### Phase 3 — Adapt to Our Hardware ⬜
-- [ ] Data pipeline for our sensors (ZED 2i, Unitree L2)
-- [ ] MLX port (if GPU-NEED == GPU-NEED, at least inference)
-- [ ] Real sensor inference tests
+## What We Skip
 
-### Phase 4 — ANIMA Integration ⬜
-- [ ] ROS2 bridge node
-- [ ] Docker container
-- [ ] API endpoints for stack composition
+- Reproducing the exact private training code structure used by the authors, because it is not released.
+- Treating the vendored public repo as production-ready ANIMA code. It is a research rollout stack with hard-coded CUDA and environment assumptions.
+- Blindly inheriting stale local scaffold names such as `RAIJIN` and `anima_raijin`.
 
-## 8. Datasets
-| Dataset | Size | URL | Phase Needed |
-|---------|------|-----|-------------|
-| (TODO) | — | — | Phase 1 |
+## What We Adapt
 
-## 9. Dependencies on Other Wave Projects
-| Needs output from | What it provides |
-|------------------|------------------|
-| (TODO or None) | — |
+- We adapt the paper into `src/anima_manip_ultradex/` with ANIMA-compatible configs, tests, API serving, and ROS2 interfaces.
+- We keep the paper-faithful policy structure, but isolate unspecified training hyperparameters behind reproducibility configs and ablations.
+- We preserve the public BODex and cuRobo integration boundary while making it optional and testable in ANIMA.
 
-## 10. Success Criteria
-(TODO — quantitative benchmarks from paper)
+## Architecture Summary
 
-## 11. Risk Assessment
-(TODO — what could make this paper useless for us)
+- Synthetic pipeline:
+  object assets -> BODex grasp synthesis -> candidate filtering -> preferred grasp ranking -> cuRobo motion planning -> simulation rollout -> rendered demonstrations
+- Policy:
+  point cloud `Tensor[B, 2048, 3]` -> PointNet++ encoder -> scene tokens `Tensor[B, 256, D_scene]` -> decoder-only transformer with 4 action query tokens -> bounded Gaussian action heads -> 36-DoF command vector
+- Deployment:
+  offline inference runner -> API server -> ROS2 node -> export pipeline
 
-## 12. Build Plan
-| PRD# | Task | Status |
-|------|------|--------|
-| PRD-1 | Scaffold + Verification | ⬜ |
-| PRD-2 | Reproduce | ⬜ |
-| PRD-3 | Adapt to HW | ⬜ |
-| PRD-4 | ANIMA Integration | ⬜ |
+## Build Plan — Executable PRDs
 
-## 13. Shenzhen Demo (Apr 23-24)
-- **Demo-ready target**: Phase 2 minimum, Phase 3 preferred
-- **Demo plan**: (TODO)
+> Total PRDs: 7 | Tasks: 25 | Status: 0/25 complete
+
+| # | PRD | Title | Priority | Tasks | Status |
+|---|---|---|---|---|---|
+| 1 | [PRD-01](prds/PRD-01-foundation.md) | Foundation & Config | P0 | 4 | ⬜ |
+| 2 | [PRD-02](prds/PRD-02-core-model.md) | Core Model | P0 | 5 | ⬜ |
+| 3 | [PRD-03](prds/PRD-03-inference.md) | Inference Pipeline | P0 | 4 | ⬜ |
+| 4 | [PRD-04](prds/PRD-04-evaluation.md) | Evaluation | P1 | 3 | ⬜ |
+| 5 | [PRD-05](prds/PRD-05-api-docker.md) | API & Docker | P1 | 3 | ⬜ |
+| 6 | [PRD-06](prds/PRD-06-ros2-integration.md) | ROS2 Integration | P1 | 3 | ⬜ |
+| 7 | [PRD-07](prds/PRD-07-production.md) | Production | P2 | 3 | ⬜ |
+
+## Build Risks
+
+| Risk | Impact | Mitigation |
+|---|---|---|
+| Public repo lacks released policy training code | High | Rebuild policy from paper and validate with ablations |
+| Heavy dependency chain on BODex, cuRobo, PyTorch3D, SAPIEN, CUDA | High | Keep wrappers thin, gate tests, and isolate optional extras |
+| Current scaffold still uses `RAIJIN` naming | Medium | Fix package and config namespace first in PRD-01 |
+| Dataset split and checkpoint details are not fully disclosed | Medium | Create reproducibility configs and record all chosen defaults |
+| Real hardware differs from paper timing or calibration | Medium | Keep ROS2 and API layers explicit and benchmark sensor preprocessing separately |
+
+## Success Criteria
+
+1. The ANIMA module reproduces the paper pipeline structure and benchmark harnesses.
+2. The policy runner accepts `Tensor[B, 2048, 3]` and emits valid dual-arm plus dual-hand actions.
+3. Simulation evaluation reaches the target reproduction band documented in `ASSETS.md`.
+4. The module can be served through API and ROS2 without paper-specific hard-coding.
+
+## Key Outputs
+
+- [ASSETS.md](ASSETS.md)
+- [PIPELINE_MAP.md](PIPELINE_MAP.md)
+- [PRD index](prds/README.md)
+- [Task index](tasks/INDEX.md)
