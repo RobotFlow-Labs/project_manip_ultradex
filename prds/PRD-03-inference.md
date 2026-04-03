@@ -2,7 +2,7 @@
 
 > Module: MANIP-ULTRADEX | Priority: P0  
 > Depends on: PRD-01, PRD-02  
-> Status: ⬜ Not started
+> Status: ✅ Scaffold implemented and validated locally
 
 ## Objective
 
@@ -19,11 +19,11 @@ Paper references:
 
 ## Acceptance Criteria
 
-- [ ] Inference preprocessing reproduces the paper’s point-cloud contract with FPS downsampling to 2,048 points.
-- [ ] The runner can load a checkpoint and emit `Tensor[B, 36]` action vectors split into arms and hands.
-- [ ] Real-world preprocessing includes optional SOR filtering and robot imaged point-cloud fusion.
-- [ ] Export entrypoints exist for Torch checkpoint, ONNX, and MLX-oriented inference conversion.
-- [ ] Test: `uv run pytest tests/test_inference_runner.py -v` passes.
+- [x] Inference preprocessing reproduces the paper’s point-cloud contract with FPS downsampling to 2,048 points.
+- [x] The runner can load a checkpoint and emit `Tensor[B, 36]` action vectors split into arms and hands.
+- [x] Real-world preprocessing includes optional SOR filtering and robot imaged point-cloud fusion.
+- [x] Export entrypoints exist for Torch checkpoint, ONNX, and MLX-oriented inference conversion.
+- [x] Test: `uv run pytest tests/test_inference_runner.py -v` passes.
 
 ## Files to Create
 

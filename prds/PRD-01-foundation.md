@@ -2,7 +2,7 @@
 
 > Module: MANIP-ULTRADEX | Priority: P0  
 > Depends on: None  
-> Status: ⬜ Not started
+> Status: ✅ Scaffold implemented and validated locally
 
 ## Objective
 
@@ -19,11 +19,11 @@ Paper references:
 
 ## Acceptance Criteria
 
-- [ ] The repo namespace is corrected from `anima_raijin` / `RAIJIN` to `anima_manip_ultradex` / `MANIP-ULTRADEX`.
-- [ ] A typed config layer captures paper constants, asset paths, backend toggles, and optional third-party dependency switches.
-- [ ] Wrapper interfaces exist for BODex grasp synthesis, cuRobo planning, and SAPIEN observations without directly hard-coding upstream paths in business logic.
-- [ ] A fixture loader can resolve the vendored bowl asset and correct paper PDF from local paths.
-- [ ] Test: `uv run pytest tests/test_foundation_config.py -v` passes.
+- [x] The repo namespace is corrected from `anima_raijin` / `RAIJIN` to `anima_manip_ultradex` / `MANIP-ULTRADEX`.
+- [x] A typed config layer captures paper constants, asset paths, backend toggles, and optional third-party dependency switches.
+- [x] Wrapper interfaces exist for BODex grasp synthesis, cuRobo planning, and SAPIEN observations without directly hard-coding upstream paths in business logic.
+- [x] A fixture loader can resolve the vendored bowl asset and correct paper PDF from local paths.
+- [x] Test: `uv run pytest tests/test_foundation_config.py -v` passes.
 
 ## Files to Create
 

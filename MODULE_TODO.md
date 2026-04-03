@@ -1,24 +1,23 @@
-# RAIJIN — Design & Implementation Checklist
+# MANIP-ULTRADEX — Design & Implementation Checklist
 
-## Paper: UltraDexGrasp: Bimanual Dexterous Grasping
-## ArXiv: 2503.13300
+## Paper: UltraDexGrasp: Learning Universal Dexterous Grasping for Bimanual Robots with Synthetic Data
+## ArXiv: 2603.05312
 ## Repo: https://github.com/InternRobotics/UltraDexGrasp
 
 ---
 
 ## Phase 1: Scaffold + Verification
 - [x] Project structure created
-- [ ] Paper PDF downloaded to papers/
-- [ ] Paper read and annotated
-- [ ] Reference repo cloned
+- [x] Correct paper PDF downloaded to papers/
+- [x] Paper read and matched against repo
+- [x] Reference repo vendored locally
 - [ ] Reference demo runs successfully
 - [ ] Datasets identified and accessibility confirmed
-- [ ] CLAUDE.md filled with paper-specific details
-- [ ] PRD.md filled with architecture and plan
+- [x] PRD.md filled with architecture and plan
 
 ## Phase 2: Reproduce
-- [ ] Core model implemented in src/anima_raijin/
-- [ ] Training pipeline (scripts/train.py)
+- [ ] Core model implemented in src/anima_manip_ultradex/
+- [x] Training pipeline scaffolded in scripts/train.py
 - [ ] Evaluation pipeline (scripts/eval.py)
 - [ ] Metrics match paper (within ±5%)
 - [ ] Dual-compute verified (MLX + CUDA)

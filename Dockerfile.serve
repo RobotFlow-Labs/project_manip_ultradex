@@ -1,9 +1,16 @@
 FROM python:3.11-slim
+
 WORKDIR /app
+
 RUN pip install --no-cache-dir uv
+
 COPY pyproject.toml README.md ./
 COPY src ./src
 COPY configs ./configs
 COPY anima_module.yaml ./
+
 RUN uv sync --system --extra serve
-CMD ["uvicorn", "anima_manip_ultradex.serve:app", "--host", "0.0.0.0", "--port", "8000"]
+
+EXPOSE 8000
+
+CMD ["uv", "run", "uvicorn", "anima_manip_ultradex.serve:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,11 +1,13 @@
 version: "3.8"
 services:
-  raijin:
-    build: .
+  manip-ultradex:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     volumes:
       - /Volumes/AIFlowDev/RobotFlowLabs/datasets:/data:ro
     environment:
-      - ANIMA_BACKEND=cuda
+      - ANIMA_BACKEND=auto
     deploy:
       resources:
         reservations:

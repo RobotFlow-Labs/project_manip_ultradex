@@ -1,0 +1,11 @@
+services:
+  manip-ultradex-serve:
+    build:
+      context: .
+      dockerfile: Dockerfile.serve
+    ports:
+      - "8000:8000"
+    environment:
+      ANIMA_BACKEND: auto
+    volumes:
+      - /Volumes/AIFlowDev/RobotFlowLabs/datasets:/Volumes/AIFlowDev/RobotFlowLabs/datasets:ro

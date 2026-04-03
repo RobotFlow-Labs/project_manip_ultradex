@@ -1,0 +1,14 @@
+name: manip-ultradex
+codename: MANIP-ULTRADEX
+domain: manipulation
+package: anima_manip_ultradex
+python: "3.11"
+paper:
+  title: UltraDexGrasp: Learning Universal Dexterous Grasping for Bimanual Robots with Synthetic Data
+  arxiv: "2603.05312"
+entrypoints:
+  train: "uv run python scripts/train.py"
+  serve: "uv run uvicorn anima_manip_ultradex.serve:app --host 0.0.0.0 --port 8000"
+artifacts:
+  config: "configs/default.toml"
+  prd: "PRD.md"

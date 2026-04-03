@@ -2,7 +2,7 @@
 
 > Module: MANIP-ULTRADEX | Priority: P1  
 > Depends on: PRD-02, PRD-03  
-> Status: ⬜ Not started
+> Status: ✅ Scaffold implemented and validated locally
 
 ## Objective
 
@@ -19,10 +19,10 @@ Paper references:
 
 ## Acceptance Criteria
 
-- [ ] A simulation benchmark harness reproduces seen/unseen and small/medium/large reporting groups.
-- [ ] A real-world benchmark harness supports 25-object logging with per-trial outcomes.
-- [ ] Report generation can emit markdown and JSON summaries that compare local metrics to paper targets.
-- [ ] Test: `uv run pytest tests/test_evaluation_metrics.py -v` passes.
+- [x] A simulation benchmark harness reproduces seen/unseen and small/medium/large reporting groups.
+- [x] A real-world benchmark harness supports 25-object logging with per-trial outcomes.
+- [x] Report generation can emit markdown and JSON summaries that compare local metrics to paper targets.
+- [x] Test: `uv run pytest tests/test_evaluation_metrics.py -v` passes.
 
 ## Files to Create
 

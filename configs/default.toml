@@ -1,19 +1,44 @@
 [project]
-name = "anima-raijin"
-codename = "RAIJIN"
+name = "anima-manip-ultradex"
+codename = "MANIP-ULTRADEX"
 functional_name = "MANIP-ultradex"
 wave = 7
-paper_arxiv = "2503.13300"
+paper_arxiv = "2603.05312"
+package = "anima_manip_ultradex"
+python_version = "3.11"
 
 [compute]
-backend = "auto"  # "mlx", "cuda", "auto"
+backend = "auto"  # "mlx", "cuda", "cpu", "auto"
 precision = "fp32"
+mac_support = true
+cuda_support = true
 
 [data]
 shared_volume = "/Volumes/AIFlowDev/RobotFlowLabs/datasets"
 repos_volume = "/Volumes/AIFlowDev/RobotFlowLabs/repos/wave7"
+ultradexgrasp_dataset = "datasets/manip-ultradex/ultradexgrasp_20m"
+dexgraspnet_assets = "datasets/dexgraspnet/selected_1000"
+sim_benchmark = "datasets/manip-ultradex/benchmarks/sim_600"
+real_benchmark = "datasets/manip-ultradex/benchmarks/real_25"
+policy_checkpoint = "models/manip-ultradex/policy/latest.ckpt"
 
 [hardware]
 zed2i = true
 unitree_l2_lidar = true
-cobot_xarm6 = false  # Set true when purchased
+dual_ur5e = true
+dual_xhand_12dof = true
+azure_kinect_dk = true
+cobot_xarm6 = false
+
+[paper]
+candidate_grasps_per_object = 500
+pregrasp_offset_m = 0.1
+lift_target_m = 0.2
+lift_success_height_m = 0.17
+lift_hold_time_s = 1.0
+policy_input_points = 2048
+point_group_knn = 32
+abstraction_output_points = 256
+action_query_tokens = 4
+arm_action_dims = 12
+hand_action_dims = 24

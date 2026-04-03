@@ -2,7 +2,7 @@
 
 > Module: MANIP-ULTRADEX | Priority: P0  
 > Depends on: PRD-01  
-> Status: ⬜ Not started
+> Status: ✅ Scaffold implemented and validated locally
 
 ## Objective
 
@@ -19,12 +19,12 @@ Paper references:
 
 ## Acceptance Criteria
 
-- [ ] The grasp-synthesis wrapper exposes candidate grasps and preferred-grasp selection for all four paper strategies.
-- [ ] The demonstration generator reproduces the four rollout stages and success criteria from the paper.
-- [ ] The point encoder accepts `Tensor[B, 2048, 3]` and emits scene tokens `Tensor[B, 256, D_scene]`.
-- [ ] The transformer backbone uses learnable action queries with unidirectional attention to scene tokens.
-- [ ] The action head predicts a bounded Gaussian distribution and computes negative log-likelihood loss.
-- [ ] Test: `uv run pytest tests/test_grasp_pipeline.py tests/test_policy_network.py -v` passes.
+- [x] The grasp-synthesis wrapper exposes candidate grasps and preferred-grasp selection for all four paper strategies.
+- [x] The demonstration generator reproduces the four rollout stages and success criteria from the paper.
+- [x] The point encoder accepts `Tensor[B, 2048, 3]` and emits scene tokens `Tensor[B, 256, D_scene]`.
+- [x] The transformer backbone uses learnable action queries with unidirectional attention to scene tokens.
+- [x] The action head predicts a bounded Gaussian distribution and computes negative log-likelihood loss.
+- [x] Test: `uv run pytest tests/test_grasp_pipeline.py tests/test_policy_network.py -v` passes.
 
 ## Files to Create
 
