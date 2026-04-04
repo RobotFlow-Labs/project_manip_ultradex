@@ -20,8 +20,8 @@ This project covers exactly ONE paper: UltraDexGrasp: Bimanual Dexterous Graspin
 
 ## 3. Current Status
 - **Date**: 2026-04-04
-- **Phase**: All PRDs + training + TRT export + HF push complete. Ready for real data.
-- **MVP Readiness**: 90%
+- **Phase**: COMPLETE. Trained, exported, shipped. Blocked only on IsaacGym (needs py3.8) for real grasp data.
+- **MVP Readiness**: 95%
 - **Accomplished**:
   1. PRD-01 foundation: config, types, device detection, reference wrappers
   2. PRD-02 core model: grasp types, selection, demo generator, replay buffer, PointNet++ encoder, decoder-only transformer, action queries, bounded Gaussian head, full policy assembly
