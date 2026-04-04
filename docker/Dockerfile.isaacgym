@@ -1,0 +1,63 @@
+# IsaacGym Preview 4 — Python 3.8 grasp generation container
+# Produces replay shards from DexGraspNet objects via BODex + cuRobo + IsaacGym
+#
+# Build (from project root):
+#   docker build -f docker/Dockerfile.isaacgym \
+#     --build-context isaacgym=/mnt/forge-data/shared_infra/simulators/isaacgym \
+#     -t manip-ultradex-isaacgym .
+#
+# Run:
+#   docker run --gpus '"device=2"' --rm \
+#     -v /mnt/forge-data/repos/BODex_api:/bodex:ro \
+#     -v /mnt/forge-data/repos/curobo:/curobo:ro \
+#     -v /mnt/forge-data/datasets/dexgraspnet/meshdata:/meshdata:ro \
+#     -v /mnt/forge-data/datasets/manip-ultradex:/output \
+#     manip-ultradex-isaacgym \
+#     python /app/generate_grasps.py \
+#       --meshdata /meshdata --output /output/real_grasps --num-objects 100
+
+FROM nvidia/cuda:12.0.1-devel-ubuntu20.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics
+
+# System deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.8 python3.8-dev python3.8-venv python3-pip \
+    libgl1-mesa-glx libglib2.0-0 libsm6 libxext6 libxrender1 \
+    libegl1-mesa libglvnd-dev \
+    git wget && \
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1 && \
+    update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1 && \
+    python -m pip install --upgrade pip setuptools wheel && \
+    rm -rf /var/lib/apt/lists/*
+
+# PyTorch 2.1 for py3.8 + CUDA 12.1
+RUN pip install --no-cache-dir \
+    torch==2.1.2 torchvision==0.16.2 torchaudio==2.1.2 \
+    --index-url https://download.pytorch.org/whl/cu121
+
+# IsaacGym Preview 4 — copied from build context
+COPY --from=isaacgym /python /opt/isaacgym/python
+COPY --from=isaacgym /assets /opt/isaacgym/assets
+RUN cd /opt/isaacgym/python && pip install . --no-deps
+
+# Python deps for BODex / grasp synthesis
+RUN pip install --no-cache-dir \
+    numpy scipy trimesh pyyaml pillow plyfile \
+    setuptools-scm h5py tqdm warp-lang
+
+WORKDIR /app
+
+# Copy grasp generation script
+COPY docker/generate_grasps.py /app/generate_grasps.py
+COPY src/anima_manip_ultradex/data/replay_buffer.py /app/replay_buffer.py
+COPY src/anima_manip_ultradex/grasp/types.py /app/grasp_types.py
+
+# BODex and cuRobo mounted at runtime via -v
+ENV PYTHONPATH="/bodex/src:/curobo/src:/bodex:${PYTHONPATH}"
+ENV ISAACGYM_PATH="/opt/isaacgym"
+
+CMD ["python", "/app/generate_grasps.py", "--help"]
