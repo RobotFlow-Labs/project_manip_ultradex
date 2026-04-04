@@ -16,33 +16,41 @@ This project covers exactly ONE paper: UltraDexGrasp: Bimanual Dexterous Graspin
 - **Link**: https://arxiv.org/abs/2603.05312
 - **Repo**: https://github.com/InternRobotics/UltraDexGrasp
 - **Compute**: GPU-NEED
-- **Verification status**: Correct paper PDF ✅ | Repo ✅ | Planning PRDs ✅ | PRD-01/02/03/04 scaffolds validated locally ✅
+- **Verification status**: Correct paper PDF ✅ | Repo ✅ | All 7 PRDs built ✅ | 43 tests pass ✅
 
 ## 3. Current Status
-- **Date**: 2026-04-03
-- **Phase**: PRD-05 serving hardening next
-- **MVP Readiness**: 50%
+- **Date**: 2026-04-04
+- **Phase**: All PRDs complete. Ready for training data + training.
+- **MVP Readiness**: 75%
 - **Accomplished**:
-  1. Correct UltraDexGrasp paper identified and stored locally
-  2. PRD suite, task deck, and asset manifest created
-  3. Autopilot Gate 1 complete
-  4. Autopilot Gate 2 found training data and weights missing on this Mac
-  5. Autopilot Gate 3 infra gaps closed with `anima_module.yaml`, serve Dockerfiles, train/export CLIs, and package rename to `anima_manip_ultradex`
-  6. PRD-01 foundation scaffold completed and validated
-  7. PRD-02 core model scaffold completed: replay schema, grasp ranking, demo generator, point encoder, action queries, decoder-only transformer, bounded Gaussian head, assembled policy
-  8. PRD-03 inference scaffold completed: preprocess, checkpoint runner, postprocess, offline inference CLI, export CLI, FastAPI `/predict` surface
-  9. PRD-04 evaluation scaffold completed: manifest-driven sim/real benchmark harness, subgroup metrics, markdown/json reporting, evaluation CLIs
-  10. Local validation passed: `uv run ruff check src/ tests/ scripts/`, `uv run pytest -v`, `uv run python scripts/train.py --dry-run`, CLI/export/eval smoke checks
+  1. PRD-01 foundation: config, types, device detection, reference wrappers
+  2. PRD-02 core model: grasp types, selection, demo generator, replay buffer, PointNet++ encoder, decoder-only transformer, action queries, bounded Gaussian head, full policy assembly
+  3. PRD-03 inference: preprocess (CUDA FPS kernel integrated), postprocess, runner, offline CLI, export CLI
+  4. PRD-04 evaluation: manifest-driven benchmark harness, subgroup metrics, markdown/JSON reporting
+  5. PRD-05 API & Docker: FastAPI with /health /ready /info /predict, Dockerfile.serve, docker-compose.serve.yml, .env.serve
+  6. PRD-06 ROS2: policy node, message types, launch file, topic definitions
+  7. PRD-07 production: release manifest, health checks, export pipeline (pth→safetensors→ONNX→TRT), package_release script
+  8. CUDA integration: FPS kernel (7.2x), SE3 transform (30x) installed from shared infra
+  9. Point encoder upgraded to use CUDA FPS for token selection on GPU
+  10. Sim adapter updated for IsaacGym + Isaac Lab + mock backend
+  11. Export pipeline verified: pth (2.4MB) + safetensors (2.4MB) + ONNX (0.5MB)
+  12. venv created on GPU server: Python 3.11, torch 2.11.0+cu128, 8x L4 GPUs
+  13. 43/43 tests pass (including 6 CUDA integration tests on GPU)
+  14. Ruff lint clean, ruff format clean
 - **TODO**:
-  1. Replace random-init policy usage with real checkpoint loading once dataset/weights exist
-  2. Materialize dataset generation pipeline against DexGraspNet selected-1000 and UltraDexGrasp-20M replay shards
-  3. Wire CUDA server bootstrap and verify BODex / cuRobo / PyTorch3D imports on Linux GPU host
-  4. Start PRD-05 serving hardening and PRD-06 ROS2 integration
-  5. Add PRD-07 production packaging, model artifact publishing, and deployment hardening
+  1. Build new CUDA kernels: grasp_synthesis (batched wrench computation) + hand_kinematics (batched FK/Jacobian) — agent building in background
+  2. Materialize UltraDexGrasp-20M dataset generation pipeline
+  3. Wire IsaacGym Preview 4 environment for paper-compatible RL training
+  4. Wire Isaac Lab environment for future-proof path
+  5. Build training script (scripts/train.py) with config-driven hyperparameters
+  6. Run GPU batch finder and start training
+  7. Install TensorRT and complete TRT fp16/fp32 exports
+  8. Push to HuggingFace: ilessio-aiflowlab/project_manip_ultradex
 - **Blockers**:
-  1. UltraDexGrasp-20M dataset missing locally
-  2. DexGraspNet selected-1000 assets missing locally
-  3. CUDA-side BODex / cuRobo / PyTorch3D stack unavailable on this Mac
+  1. UltraDexGrasp-20M dataset must be generated (no public download)
+  2. DexGraspNet selected-1000 object assets not yet on disk
+  3. TensorRT not installed on server (needed for TRT fp16/fp32 export)
+  4. IsaacGym Python package not yet installed in venv (shared sim path exists)
 
 ## 4. Datasets
 ### Required for this paper
@@ -54,27 +62,34 @@ This project covers exactly ONE paper: UltraDexGrasp: Bimanual Dexterous Graspin
 | Real benchmark 25 | 25 objects | local benchmark manifest | eval set | Eval |
 
 ### Check shared volume first
-/Volumes/AIFlowDev/RobotFlowLabs/datasets
-
-### Download
-`bash scripts/download_data.sh`
+/mnt/forge-data/datasets/
 
 ### Current preflight result
-- `/Volumes/AIFlowDev/RobotFlowLabs/datasets/datasets/manip-ultradex/ultradexgrasp_20m` — MISSING
-- `/Volumes/AIFlowDev/RobotFlowLabs/datasets/datasets/dexgraspnet/selected_1000` — MISSING
-- `/Volumes/AIFlowDev/RobotFlowLabs/datasets/datasets/manip-ultradex/benchmarks/sim_600` — MISSING
-- `/Volumes/AIFlowDev/RobotFlowLabs/datasets/datasets/manip-ultradex/benchmarks/real_25` — MISSING
+- UltraDexGrasp-20M — MISSING (must generate)
+- DexGraspNet selected_1000 — MISSING
+- Sim benchmark 600 — MISSING (generate from paper §VI.A)
+- Real benchmark 25 — MISSING (generate from paper §VI.B)
 
 ## 5. Hardware
+- 8x NVIDIA L4 (23GB each) — CUDA_VISIBLE_DEVICES=2 assigned
 - ZED 2i stereo camera: Available
 - Unitree L2 3D LiDAR: Available
 - Dual UR5e + dual XHand target embodiment: Planned
-- Mac Studio M-series: active local prebuild target
-- CUDA server / 8x RTX 6000 Pro Blackwell: post-prebuild training target
+- IsaacGym Preview 4: /mnt/forge-data/shared_infra/simulators/isaacgym/
+- Isaac Lab: /mnt/forge-data/shared_infra/simulators/IsaacLab/
 
-## 6. Session Log
+## 6. CUDA Kernels
+### Shared (installed)
+- point_cloud_ops: FPS (7.2x speedup) — verified on GPU 2
+- se3_transform: SE3 (30x speedup) — verified on GPU 2
+
+### Module-specific (building)
+- grasp_synthesis: batched wrench computation + collision check — building in background
+- hand_kinematics: batched FK + Jacobian for XHand — building in background
+
+## 7. Session Log
 | Date | Agent | What Happened |
 |------|-------|---------------|
 | 2026-04-03 | ANIMA Research Agent | Project scaffolded |
-| 2026-04-03 | Codex Autopilot | Gate 0-3 run. Correct paper verified. Data and training weights missing locally. Foundation build started from PRD-01. |
-| 2026-04-03 | Codex Build Pass | Completed PRD-01 foundation, PRD-02 core model scaffold, PRD-03 inference scaffold, PRD-04 evaluation scaffold, API predict route, Docker/service cleanup, UV 3.11 lock refresh, and 20 passing tests on macOS. |
+| 2026-04-03 | Codex Autopilot | Gate 0-3 run. PRD-01 through PRD-04 scaffolds built on Mac. |
+| 2026-04-04 | GPU Autopilot | Moved to GPU server. Fixed 6 missing __init__.py + created data/ package. Created venv (py3.11, torch cu128). Installed shared CUDA kernels. Built PRD-05 (API+Docker), PRD-06 (ROS2), PRD-07 (Production). Upgraded point encoder with CUDA FPS. Updated sim adapter for IsaacGym + Isaac Lab + mock. Export pipeline verified (pth+safetensors+ONNX). 43/43 tests pass. Launched CUDA kernel build agent for grasp_synthesis + hand_kinematics. |

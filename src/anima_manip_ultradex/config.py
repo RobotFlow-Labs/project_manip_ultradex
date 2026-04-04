@@ -98,7 +98,9 @@ class ModuleConfig(BaseModel):
 
     @property
     def bowl_mesh(self) -> Path:
-        return self.reference_repo_root / "asset" / "object_mesh" / "bowl" / "mesh" / "simplified.obj"
+        return (
+            self.reference_repo_root / "asset" / "object_mesh" / "bowl" / "mesh" / "simplified.obj"
+        )
 
     @property
     def ultradexgrasp_dataset_root(self) -> Path:
@@ -122,6 +124,8 @@ class ModuleConfig(BaseModel):
 
 
 def load_module_config(path: str | os.PathLike[str] | None = None) -> ModuleConfig:
-    config_path = Path(path) if path else Path(__file__).resolve().parents[2] / "configs" / "default.toml"
+    config_path = (
+        Path(path) if path else Path(__file__).resolve().parents[2] / "configs" / "default.toml"
+    )
     raw = tomllib.loads(config_path.read_text())
     return ModuleConfig(**raw)

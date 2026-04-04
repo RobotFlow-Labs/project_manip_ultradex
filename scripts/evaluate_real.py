@@ -24,14 +24,20 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     args = build_parser().parse_args()
     cfg = load_module_config(args.config)
-    manifest_path = Path(args.manifest) if args.manifest else (cfg.real_benchmark_root / "manifest.json")
+    manifest_path = (
+        Path(args.manifest) if args.manifest else (cfg.real_benchmark_root / "manifest.json")
+    )
     if not manifest_path.exists():
         print(f"Real-world manifest not found: {manifest_path}", file=sys.stderr)
         return 2
 
     summary = RealWorldBenchmark(manifest_path).run()
     if args.format == "markdown":
-        print(render_markdown_report("Real-world", summary, paper_target=PAPER_TARGETS["real_overall"]))
+        print(
+            render_markdown_report(
+                "Real-world", summary, paper_target=PAPER_TARGETS["real_overall"]
+            )
+        )
     else:
         print(json.dumps(summary, indent=2))
     return 0

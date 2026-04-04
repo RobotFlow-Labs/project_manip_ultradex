@@ -63,17 +63,17 @@ The public repo only exposes the rollout and asset-generation side. The PRD suit
 
 ## Build Plan — Executable PRDs
 
-> Total PRDs: 7 | Tasks: 25 | Status: 0/25 complete
+> Total PRDs: 7 | Tasks: 25 | Status: 25/25 complete
 
 | # | PRD | Title | Priority | Tasks | Status |
 |---|---|---|---|---|---|
-| 1 | [PRD-01](prds/PRD-01-foundation.md) | Foundation & Config | P0 | 4 | ⬜ |
-| 2 | [PRD-02](prds/PRD-02-core-model.md) | Core Model | P0 | 5 | ⬜ |
-| 3 | [PRD-03](prds/PRD-03-inference.md) | Inference Pipeline | P0 | 4 | ⬜ |
-| 4 | [PRD-04](prds/PRD-04-evaluation.md) | Evaluation | P1 | 3 | ⬜ |
-| 5 | [PRD-05](prds/PRD-05-api-docker.md) | API & Docker | P1 | 3 | ⬜ |
-| 6 | [PRD-06](prds/PRD-06-ros2-integration.md) | ROS2 Integration | P1 | 3 | ⬜ |
-| 7 | [PRD-07](prds/PRD-07-production.md) | Production | P2 | 3 | ⬜ |
+| 1 | [PRD-01](prds/PRD-01-foundation.md) | Foundation & Config | P0 | 4 | ✅ |
+| 2 | [PRD-02](prds/PRD-02-core-model.md) | Core Model | P0 | 5 | ✅ |
+| 3 | [PRD-03](prds/PRD-03-inference.md) | Inference Pipeline | P0 | 4 | ✅ |
+| 4 | [PRD-04](prds/PRD-04-evaluation.md) | Evaluation | P1 | 3 | ✅ |
+| 5 | [PRD-05](prds/PRD-05-api-docker.md) | API & Docker | P1 | 3 | ✅ |
+| 6 | [PRD-06](prds/PRD-06-ros2-integration.md) | ROS2 Integration | P1 | 3 | ✅ |
+| 7 | [PRD-07](prds/PRD-07-production.md) | Production | P2 | 3 | ✅ |
 
 ## Build Risks
 

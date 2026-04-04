@@ -68,9 +68,7 @@ def select_preferred_grasp(
     strategy: GraspStrategy | None = None,
 ) -> GraspCandidate:
     filtered = [
-        candidate
-        for candidate in candidates
-        if strategy is None or candidate.strategy == strategy
+        candidate for candidate in candidates if strategy is None or candidate.strategy == strategy
     ]
     if not filtered:
         raise ValueError("No grasp candidates available for selection.")

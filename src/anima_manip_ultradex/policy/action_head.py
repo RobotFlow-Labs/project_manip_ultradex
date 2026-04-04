@@ -44,9 +44,14 @@ class BoundedGaussianActionHead(nn.Module):
         log_std: torch.Tensor,
     ) -> torch.Tensor:
         variance = torch.exp(log_std * 2.0)
-        return 0.5 * (((targets - mean) ** 2) / variance + 2.0 * log_std + torch.log(
-            torch.full_like(log_std, 2.0 * pi)
-        )).mean()
+        return (
+            0.5
+            * (
+                ((targets - mean) ** 2) / variance
+                + 2.0 * log_std
+                + torch.log(torch.full_like(log_std, 2.0 * pi))
+            ).mean()
+        )
 
     def forward(
         self,
@@ -66,7 +71,9 @@ class BoundedGaussianActionHead(nn.Module):
         action_mean = torch.cat(mean_chunks, dim=-1)
         action_log_std = torch.cat(log_std_chunks, dim=-1)
         if action_mean.shape[-1] != self.total_dims:
-            raise ValueError(f"Expected {self.total_dims} action dims, got {action_mean.shape[-1]}.")
+            raise ValueError(
+                f"Expected {self.total_dims} action dims, got {action_mean.shape[-1]}."
+            )
 
         sample = action_mean
         arm_actions = torch.stack((action_mean[:, :6], action_mean[:, 6:12]), dim=1)

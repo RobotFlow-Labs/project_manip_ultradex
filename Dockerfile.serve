@@ -1,16 +1,35 @@
-FROM python:3.11-slim
+# MANIP-ULTRADEX — GPU-aware serving container
+# 3-layer pattern: anima-base → anima-serve → module
+ARG BASE_IMAGE=ghcr.io/robotflow-labs/anima-serve:jazzy
+FROM ${BASE_IMAGE} AS serve
+
+LABEL org.opencontainers.image.title="anima-manip-ultradex"
+LABEL org.opencontainers.image.description="UltraDexGrasp bimanual dexterous grasping policy"
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir uv
-
 COPY pyproject.toml README.md ./
-COPY src ./src
-COPY configs ./configs
-COPY anima_module.yaml ./
+COPY src/ src/
+COPY configs/ configs/
+COPY anima_module.yaml .
 
-RUN uv sync --system --extra serve
+RUN pip install --no-cache-dir uv && \
+    uv pip install --system --no-cache-dir \
+        torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128 && \
+    uv pip install --system --no-cache-dir ".[serve,train,export]"
 
-EXPOSE 8000
+ENV ANIMA_MODULE_NAME=manip_ultradex \
+    ANIMA_MODULE_VERSION=0.1.0 \
+    ANIMA_HF_REPO=ilessio-aiflowlab/project_manip_ultradex \
+    ANIMA_SERVE_PORT=8080 \
+    ANIMA_DEVICE=auto \
+    ANIMA_WEIGHT_FORMAT=auto \
+    ANIMA_WEIGHT_DIR=/data/weights
 
-CMD ["uv", "run", "uvicorn", "anima_manip_ultradex.serve:app", "--host", "0.0.0.0", "--port", "8000"]
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+CMD ["uvicorn", "anima_manip_ultradex.api.app:app", \
+     "--host", "0.0.0.0", "--port", "8080"]

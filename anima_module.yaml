@@ -3,12 +3,61 @@ codename: MANIP-ULTRADEX
 domain: manipulation
 package: anima_manip_ultradex
 python: "3.11"
+version: "0.1.0"
 paper:
   title: UltraDexGrasp: Learning Universal Dexterous Grasping for Bimanual Robots with Synthetic Data
   arxiv: "2603.05312"
+  repo: https://github.com/InternRobotics/UltraDexGrasp
+
+capabilities:
+  - bimanual_dexterous_grasping
+  - point_cloud_policy_inference
+  - dual_arm_dual_hand_control
+
+api:
+  port: 8080
+  endpoints:
+    - GET /health
+    - GET /ready
+    - GET /info
+    - POST /predict
+
+docker:
+  serve: Dockerfile.serve
+  compose: docker-compose.serve.yml
+
+ros2:
+  node: ultradex_policy_node
+  topics:
+    subscribe:
+      - /manip_ultradex/scene_pointcloud
+      - /manip_ultradex/robot_state
+    publish:
+      - /manip_ultradex/arm_action
+      - /manip_ultradex/hand_action
+      - /manip_ultradex/status
+
 entrypoints:
   train: "uv run python scripts/train.py"
-  serve: "uv run uvicorn anima_manip_ultradex.serve:app --host 0.0.0.0 --port 8000"
+  serve: "uv run uvicorn anima_manip_ultradex.api.app:app --host 0.0.0.0 --port 8080"
+  export: "uv run python scripts/export_policy.py"
+  evaluate: "uv run python scripts/evaluate_sim.py"
+
 artifacts:
-  config: "configs/default.toml"
-  prd: "PRD.md"
+  config: configs/default.toml
+  prd: PRD.md
+  checkpoint: /mnt/artifacts-datai/checkpoints/project_manip_ultradex/
+  exports: /mnt/artifacts-datai/exports/project_manip_ultradex/
+
+simulators:
+  isaacgym: /mnt/forge-data/shared_infra/simulators/isaacgym/
+  isaac_lab: /mnt/forge-data/shared_infra/simulators/IsaacLab/
+  mock: true
+
+cuda_kernels:
+  shared:
+    - point_cloud_ops (FPS, 7.2x speedup)
+    - se3_transform (30x speedup)
+  module:
+    - grasp_synthesis (batched wrench computation)
+    - hand_kinematics (batched FK/Jacobian)

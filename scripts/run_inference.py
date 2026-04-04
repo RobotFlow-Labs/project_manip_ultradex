@@ -24,7 +24,9 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     args = build_parser().parse_args()
     cfg = load_module_config(args.config)
-    runner = UltraDexRunner(cfg, checkpoint_path=args.checkpoint, d_model=64, num_heads=4, num_layers=2)
+    runner = UltraDexRunner(
+        cfg, checkpoint_path=args.checkpoint, d_model=64, num_heads=4, num_layers=2
+    )
 
     raw_pc = np.random.default_rng(7).normal(size=(args.synthetic_points, 3)).astype(np.float32)
     robot_pc = np.random.default_rng(17).normal(size=(256, 3)).astype(np.float32) * 0.1

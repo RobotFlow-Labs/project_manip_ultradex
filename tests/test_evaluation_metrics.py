@@ -6,8 +6,12 @@ def _records() -> list[EvalRecord]:
     return [
         EvalRecord(benchmark="sim", object_id="a", success=True, split="seen", size_group="small"),
         EvalRecord(benchmark="sim", object_id="b", success=False, split="seen", size_group="small"),
-        EvalRecord(benchmark="sim", object_id="c", success=True, split="unseen", size_group="large"),
-        EvalRecord(benchmark="sim", object_id="d", success=True, split="unseen", size_group="large"),
+        EvalRecord(
+            benchmark="sim", object_id="c", success=True, split="unseen", size_group="large"
+        ),
+        EvalRecord(
+            benchmark="sim", object_id="d", success=True, split="unseen", size_group="large"
+        ),
     ]
 
 

@@ -1,11 +1,45 @@
 services:
-  manip-ultradex-serve:
+  serve:
     build:
       context: .
       dockerfile: Dockerfile.serve
+    profiles: ["serve"]
+    env_file: .env.serve
     ports:
-      - "8000:8000"
-    environment:
-      ANIMA_BACKEND: auto
+      - "${ANIMA_SERVE_PORT:-8080}:8080"
     volumes:
-      - /Volumes/AIFlowDev/RobotFlowLabs/datasets:/Volumes/AIFlowDev/RobotFlowLabs/datasets:ro
+      - weights:/data/weights
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    network_mode: host
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.serve
+    profiles: ["api"]
+    env_file: .env.serve
+    environment:
+      ANIMA_DEVICE: cpu
+    ports:
+      - "${ANIMA_SERVE_PORT:-8080}:8080"
+    network_mode: host
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.serve
+    profiles: ["test"]
+    env_file: .env.serve
+    command: ["python", "-m", "pytest", "tests/", "-v"]
+    volumes:
+      - ./tests:/app/tests:ro
+
+volumes:
+  weights:

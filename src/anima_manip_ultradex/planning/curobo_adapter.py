@@ -32,4 +32,6 @@ class CuroboAdapter:
 
     def setup(self):
         self.require_runtime()
-        raise NotImplementedError("CUDA-side cuRobo planner integration will be implemented in PRD-02.")
+        raise NotImplementedError(
+            "CUDA-side cuRobo planner integration will be implemented in PRD-02."
+        )

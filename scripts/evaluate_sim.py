@@ -24,14 +24,18 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     args = build_parser().parse_args()
     cfg = load_module_config(args.config)
-    manifest_path = Path(args.manifest) if args.manifest else (cfg.sim_benchmark_root / "manifest.json")
+    manifest_path = (
+        Path(args.manifest) if args.manifest else (cfg.sim_benchmark_root / "manifest.json")
+    )
     if not manifest_path.exists():
         print(f"Simulation manifest not found: {manifest_path}", file=sys.stderr)
         return 2
 
     summary = SimulationBenchmark(manifest_path).run()
     if args.format == "markdown":
-        print(render_markdown_report("Simulation", summary, paper_target=PAPER_TARGETS["sim_overall"]))
+        print(
+            render_markdown_report("Simulation", summary, paper_target=PAPER_TARGETS["sim_overall"])
+        )
     else:
         print(json.dumps(summary, indent=2))
     return 0
