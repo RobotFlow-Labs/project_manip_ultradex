@@ -85,3 +85,46 @@ def test_mock_sim_env() -> None:
     assert obs["scene_pc"].shape == (2, 2048, 3)
     obs2, reward, done, info = env.step(np.zeros((2, 36)))
     assert info["backend"] == "mock"
+
+
+def test_grasp_synthesis_cuda_kernel() -> None:
+    from grasp_synthesis import compute_grasp_quality
+
+    contacts = torch.randn(8, 5, 3, device="cuda")
+    normals = torch.nn.functional.normalize(torch.randn(8, 5, 3, device="cuda"), dim=-1)
+    quality = compute_grasp_quality(contacts, normals, friction_coeff=0.5, num_friction_edges=8)
+    assert quality.shape == (8,)
+    assert quality.device.type == "cuda"
+    assert torch.all(quality >= 0)
+
+
+def test_grasp_synthesis_batch_collision_check() -> None:
+    from grasp_synthesis import batch_collision_check
+
+    hand_pts = torch.randn(4, 100, 3, device="cuda")
+    sdf = torch.ones(4, 16, 16, 16, device="cuda")  # All positive = no collision
+    origin = torch.zeros(4, 3, device="cuda")
+    min_sdf = batch_collision_check(hand_pts, sdf, origin, sdf_resolution=0.1)
+    assert min_sdf.shape == (4,)
+
+
+def test_hand_kinematics_forward() -> None:
+    from hand_kinematics import forward_kinematics
+
+    joints = torch.zeros(4, 12, device="cuda")
+    dh = torch.zeros(12, 4, device="cuda")
+    base = torch.eye(4, device="cuda").unsqueeze(0).expand(4, -1, -1).contiguous()
+    transforms, tips = forward_kinematics(joints, dh, base)
+    assert transforms.shape == (4, 13, 4, 4)
+    assert tips.ndim == 3 and tips.shape[0] == 4 and tips.shape[2] == 3
+
+
+def test_hand_kinematics_jacobian() -> None:
+    from hand_kinematics import jacobian
+
+    joints = torch.randn(4, 12, device="cuda")
+    dh = torch.randn(12, 4, device="cuda")
+    base = torch.eye(4, device="cuda").unsqueeze(0).expand(4, -1, -1).contiguous()
+    J = jacobian(joints, dh, base)
+    assert J.shape[0] == 4
+    assert J.shape[2] == 12  # 12 DoF

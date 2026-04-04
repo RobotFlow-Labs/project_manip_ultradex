@@ -1,0 +1,78 @@
+# Debug config — 2 epochs, small batch, for smoke testing
+[project]
+name = "anima-manip-ultradex"
+codename = "MANIP-ULTRADEX"
+functional_name = "MANIP-ultradex"
+wave = 7
+paper_arxiv = "2603.05312"
+package = "anima_manip_ultradex"
+python_version = "3.11"
+
+[compute]
+backend = "auto"
+precision = "fp32"
+mac_support = true
+cuda_support = true
+
+[data]
+shared_volume = "/mnt/forge-data"
+repos_volume = "/mnt/forge-data/repos"
+ultradexgrasp_dataset = "datasets/manip-ultradex/ultradexgrasp_20m"
+dexgraspnet_assets = "datasets/dexgraspnet/selected_1000"
+sim_benchmark = "datasets/manip-ultradex/benchmarks/sim_600"
+real_benchmark = "datasets/manip-ultradex/benchmarks/real_25"
+policy_checkpoint = "models/manip-ultradex/policy/latest.ckpt"
+
+[hardware]
+zed2i = true
+unitree_l2_lidar = true
+dual_ur5e = true
+dual_xhand_12dof = true
+azure_kinect_dk = true
+cobot_xarm6 = false
+
+[paper]
+candidate_grasps_per_object = 500
+pregrasp_offset_m = 0.1
+lift_target_m = 0.2
+lift_success_height_m = 0.17
+lift_hold_time_s = 1.0
+policy_input_points = 2048
+point_group_knn = 32
+abstraction_output_points = 256
+action_query_tokens = 4
+arm_action_dims = 12
+hand_action_dims = 24
+
+[training]
+batch_size = 4
+learning_rate = 0.0003
+epochs = 2
+optimizer = "adamw"
+weight_decay = 0.01
+scheduler = "cosine"
+warmup_ratio = 0.05
+min_lr = 1e-6
+precision = "fp32"
+gradient_accumulation = 1
+max_grad_norm = 1.0
+seed = 42
+d_model = 64
+num_heads = 4
+num_layers = 2
+
+[checkpoint]
+save_every_n_steps = 5
+keep_top_k = 2
+metric = "val_loss"
+mode = "min"
+output_dir = "/tmp/manip_ultradex_debug_ckpt"
+
+[early_stopping]
+enabled = false
+patience = 5
+min_delta = 0.001
+
+[logging]
+log_dir = "/tmp/manip_ultradex_debug_logs"
+tensorboard_dir = "/tmp/manip_ultradex_debug_tb"
