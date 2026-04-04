@@ -146,7 +146,7 @@ def main() -> int:
         cfg, d_model=args.d_model, num_heads=args.num_heads, num_layers=args.num_layers
     )
     if args.checkpoint:
-        payload = torch.load(args.checkpoint, map_location="cpu")
+        payload = torch.load(args.checkpoint, map_location="cpu", weights_only=True)
         state_dict = payload.get("state_dict", payload) if isinstance(payload, dict) else payload
         policy.load_state_dict(state_dict, strict=False)
     policy.eval()

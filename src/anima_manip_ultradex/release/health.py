@@ -60,6 +60,7 @@ def run_health_checks(checkpoint_path: str | Path | None = None) -> ProductionHe
 
     # Check model loadable
     model_ok = False
+    model_detail = ""
     if torch_ok:
         try:
             from anima_manip_ultradex.config import load_module_config
@@ -69,8 +70,8 @@ def run_health_checks(checkpoint_path: str | Path | None = None) -> ProductionHe
             policy = UltraDexPolicy(cfg, d_model=128, num_heads=4, num_layers=2)
             model_ok = policy.parameter_count > 0
         except Exception as e:
-            health.checks.append(HealthCheck("model_loadable", False, str(e)))
-    health.checks.append(HealthCheck("model_loadable", model_ok))
+            model_detail = str(e)
+    health.checks.append(HealthCheck("model_loadable", model_ok, model_detail))
 
     # Check checkpoint exists
     ckpt_ok = checkpoint_path is not None and Path(checkpoint_path).exists()
@@ -88,6 +89,7 @@ def run_health_checks(checkpoint_path: str | Path | None = None) -> ProductionHe
 
     # Check inference runnable
     inference_ok = False
+    inference_detail = ""
     if torch_ok and model_ok:
         try:
             from anima_manip_ultradex.inference.runner import UltraDexRunner
@@ -100,7 +102,7 @@ def run_health_checks(checkpoint_path: str | Path | None = None) -> ProductionHe
             result = runner.predict(pts)
             inference_ok = result.action_vector.shape[-1] == 36
         except Exception as e:
-            health.checks.append(HealthCheck("inference_runnable", False, str(e)))
-    health.checks.append(HealthCheck("inference_runnable", inference_ok))
+            inference_detail = str(e)
+    health.checks.append(HealthCheck("inference_runnable", inference_ok, inference_detail))
 
     return health

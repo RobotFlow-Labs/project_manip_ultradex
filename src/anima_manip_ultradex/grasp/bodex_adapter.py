@@ -98,7 +98,9 @@ class _LazyGraspSynthesizer:
 
     def _init(self):
         # Import at call time so module loads without CUDA
-        sys.path.insert(0, str(BODEX_REPO))
+        repo_str = str(BODEX_REPO)
+        if repo_str not in sys.path:
+            sys.path.insert(0, repo_str)
         from synthesize_grasp import GraspSynthesizer
 
         self._inner = GraspSynthesizer(self.config_path)

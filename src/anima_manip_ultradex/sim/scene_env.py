@@ -130,7 +130,14 @@ def _safe_find(name: str) -> bool:
 
 
 def _has_isaacgym() -> bool:
-    return _safe_find("isaacgym")
+    if not _safe_find("isaacgym"):
+        return False
+    try:
+        from isaacgym import gymapi  # noqa: F401
+
+        return True
+    except (ImportError, RuntimeError):
+        return False
 
 
 def _has_isaac_lab() -> bool:

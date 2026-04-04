@@ -304,7 +304,7 @@ def main() -> int:
     start_epoch = 0
     global_step = 0
     if args.resume and Path(args.resume).exists():
-        ckpt = torch.load(args.resume, map_location="cpu")
+        ckpt = torch.load(args.resume, map_location="cpu", weights_only=True)
         policy.load_state_dict(ckpt.get("state_dict", ckpt.get("model", ckpt)), strict=False)
         if "optimizer" in ckpt:
             optimizer.load_state_dict(ckpt["optimizer"])

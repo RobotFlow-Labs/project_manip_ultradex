@@ -48,7 +48,7 @@ class UltraDexRunner:
         self.policy.eval()
 
     def load_checkpoint(self, checkpoint_path: str | Path) -> dict[str, list[str]]:
-        payload = torch.load(checkpoint_path, map_location="cpu")
+        payload = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
         if isinstance(payload, dict):
             state_dict = payload.get("state_dict", payload)
         else:

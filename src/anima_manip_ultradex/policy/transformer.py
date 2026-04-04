@@ -9,7 +9,7 @@ from anima_manip_ultradex.config import ModuleConfig
 
 
 class DecoderOnlyTransformerBlock(nn.Module):
-    def __init__(self, d_model: int, num_heads: int) -> None:
+    def __init__(self, d_model: int, num_heads: int, num_queries: int = 4) -> None:
         super().__init__()
         self.self_attn = nn.MultiheadAttention(
             embed_dim=d_model,
@@ -29,14 +29,14 @@ class DecoderOnlyTransformerBlock(nn.Module):
         self.norm_1 = nn.LayerNorm(d_model)
         self.norm_2 = nn.LayerNorm(d_model)
         self.norm_3 = nn.LayerNorm(d_model)
+        # Cache causal mask as buffer — avoids allocation every forward pass
+        self.register_buffer(
+            "causal_mask",
+            torch.ones(num_queries, num_queries, dtype=torch.bool).triu(diagonal=1),
+        )
 
     def forward(self, query_tokens: torch.Tensor, scene_tokens: torch.Tensor) -> torch.Tensor:
-        causal_mask = torch.ones(
-            query_tokens.shape[1],
-            query_tokens.shape[1],
-            device=query_tokens.device,
-            dtype=torch.bool,
-        ).triu(diagonal=1)
+        causal_mask = self.causal_mask[: query_tokens.shape[1], : query_tokens.shape[1]]
         self_attended, _ = self.self_attn(
             query_tokens,
             query_tokens,
@@ -66,8 +66,11 @@ class DecoderOnlyTransformer(nn.Module):
         super().__init__()
         if cfg.paper.action_query_tokens <= 0:
             raise ValueError("Config must expose a positive number of action query tokens.")
+        num_queries = cfg.paper.action_query_tokens
         self.layers = nn.ModuleList(
-            DecoderOnlyTransformerBlock(d_model=d_model, num_heads=num_heads)
+            DecoderOnlyTransformerBlock(
+                d_model=d_model, num_heads=num_heads, num_queries=num_queries
+            )
             for _ in range(num_layers)
         )
         self.output_norm = nn.LayerNorm(d_model)

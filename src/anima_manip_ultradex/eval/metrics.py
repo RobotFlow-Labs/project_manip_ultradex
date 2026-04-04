@@ -42,18 +42,20 @@ def _group_by(records: list[EvalRecord], key_name: str) -> dict[str, float]:
 
 def render_ablation_table(records: Iterable[EvalRecord]) -> list[dict[str, object]]:
     rows = list(records)
-    return [
-        {
-            "ablation": ablation,
-            "success_rate": compute_success_rate(list(group)),
-            "num_trials": len(list(group_records)),
-        }
-        for ablation, group_records in groupby(
-            sorted(rows, key=attrgetter("ablation")),
-            key=attrgetter("ablation"),
+    result = []
+    for ablation, group_iter in groupby(
+        sorted(rows, key=attrgetter("ablation")),
+        key=attrgetter("ablation"),
+    ):
+        group = list(group_iter)
+        result.append(
+            {
+                "ablation": ablation,
+                "success_rate": compute_success_rate(group),
+                "num_trials": len(group),
+            }
         )
-        for group in [list(group_records)]
-    ]
+    return result
 
 
 def summarize_records(records: Iterable[EvalRecord]) -> dict[str, object]:

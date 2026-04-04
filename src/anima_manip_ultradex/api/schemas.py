@@ -7,10 +7,13 @@ from pydantic import BaseModel, Field
 
 class ScenePointCloudRequest(BaseModel):
     raw_points: list[list[float]] = Field(
-        ..., description="Raw scene point cloud [[x,y,z], ...], at least 256 points."
+        ...,
+        min_length=256,
+        max_length=100_000,
+        description="Raw scene point cloud [[x,y,z], ...], 256-100k points.",
     )
     robot_points: list[list[float]] | None = Field(
-        None, description="Optional robot body point cloud."
+        None, max_length=50_000, description="Optional robot body point cloud."
     )
     apply_sor: bool = Field(False, description="Apply statistical outlier removal.")
     grasp_strategy_hint: str | None = Field(

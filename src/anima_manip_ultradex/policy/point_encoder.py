@@ -13,27 +13,31 @@ from anima_manip_ultradex.config import ModuleConfig
 
 
 def _fps_indices(points: torch.Tensor, num_samples: int) -> torch.Tensor:
-    """Farthest Point Sampling indices — CUDA kernel or CPU fallback."""
-    if points.is_cuda:
-        try:
-            from point_cloud_ops import farthest_point_sample
+    """Farthest Point Sampling indices — CUDA kernel or PyTorch CPU fallback."""
+    try:
+        from point_cloud_ops import farthest_point_sample
 
-            return farthest_point_sample(points, num_samples)
-        except (ImportError, RuntimeError):
-            pass
-    # CPU fallback: uniform stride
-    return (
-        torch.linspace(
-            0,
-            points.shape[1] - 1,
-            num_samples,
-            device=points.device,
-        )
-        .round()
-        .long()
-        .unsqueeze(0)
-        .expand(points.shape[0], -1)
-    )
+        return farthest_point_sample(points, num_samples)
+    except (ImportError, RuntimeError):
+        pass
+    # PyTorch CPU fallback: true FPS algorithm
+    return _fps_cpu(points, num_samples)
+
+
+def _fps_cpu(points: torch.Tensor, num_samples: int) -> torch.Tensor:
+    """True Farthest Point Sampling on CPU — matches CUDA kernel output."""
+    B, N, _ = points.shape
+    device = points.device
+    indices = torch.zeros(B, num_samples, dtype=torch.long, device=device)
+    min_dists = torch.full((B, N), float("inf"), device=device)
+    farthest = torch.zeros(B, dtype=torch.long, device=device)
+    for k in range(num_samples):
+        indices[:, k] = farthest
+        selected = points[torch.arange(B, device=device), farthest]  # [B, 3]
+        dist = ((points - selected.unsqueeze(1)) ** 2).sum(dim=-1)  # [B, N]
+        min_dists = torch.min(min_dists, dist)
+        farthest = min_dists.argmax(dim=-1)
+    return indices
 
 
 class PointEncoder(nn.Module):

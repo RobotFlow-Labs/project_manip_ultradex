@@ -41,9 +41,16 @@ def statistical_outlier_filter(
     points: np.ndarray,
     k: int = 16,
     z_threshold: float = 2.0,
+    max_points_for_sor: int = 8192,
 ) -> np.ndarray:
     if len(points) <= k:
         return points
+
+    # Cap input size to avoid O(N^2) memory explosion
+    if len(points) > max_points_for_sor:
+        rng = np.random.default_rng(0)
+        idx = rng.choice(len(points), max_points_for_sor, replace=False)
+        points = points[idx]
 
     deltas = points[:, None, :] - points[None, :, :]
     distances = np.linalg.norm(deltas, axis=-1)

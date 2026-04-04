@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import time
 from functools import lru_cache
 
 import numpy as np
@@ -19,7 +18,6 @@ from anima_manip_ultradex.config import load_module_config
 from anima_manip_ultradex.device import detect_backend
 from anima_manip_ultradex.version import __version__
 
-_start_time = time.monotonic()
 cfg = load_module_config()
 app = FastAPI(title="MANIP-ULTRADEX", version=__version__)
 

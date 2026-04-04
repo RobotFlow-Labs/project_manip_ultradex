@@ -61,6 +61,8 @@ class PaperConstants(BaseModel):
 
 
 class ModuleConfig(BaseModel):
+    model_config = {"extra": "ignore"}
+
     project: ProjectMetadata = Field(default_factory=ProjectMetadata)
     compute: ComputeConfig = Field(default_factory=ComputeConfig)
     data: DataConfig = Field(default_factory=DataConfig)

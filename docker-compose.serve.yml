@@ -5,8 +5,7 @@ services:
       dockerfile: Dockerfile.serve
     profiles: ["serve"]
     env_file: .env.serve
-    ports:
-      - "${ANIMA_SERVE_PORT:-8080}:8080"
+    # network_mode: host publishes all ports directly — no port mapping needed
     volumes:
       - weights:/data/weights
     deploy:
@@ -29,7 +28,6 @@ services:
       ANIMA_DEVICE: cpu
     ports:
       - "${ANIMA_SERVE_PORT:-8080}:8080"
-    network_mode: host
 
   test:
     build:
