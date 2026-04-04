@@ -20,8 +20,8 @@ This project covers exactly ONE paper: UltraDexGrasp: Bimanual Dexterous Graspin
 
 ## 3. Current Status
 - **Date**: 2026-04-04
-- **Phase**: All PRDs + training pipeline complete. Ready for real data + full training.
-- **MVP Readiness**: 85%
+- **Phase**: All PRDs + training + TRT export + HF push complete. Ready for real data.
+- **MVP Readiness**: 90%
 - **Accomplished**:
   1. PRD-01 foundation: config, types, device detection, reference wrappers
   2. PRD-02 core model: grasp types, selection, demo generator, replay buffer, PointNet++ encoder, decoder-only transformer, action queries, bounded Gaussian head, full policy assembly
@@ -35,8 +35,12 @@ This project covers exactly ONE paper: UltraDexGrasp: Bimanual Dexterous Graspin
   10. Sim adapter updated for IsaacGym + Isaac Lab + mock backend
   11. Export pipeline verified: pth (2.4MB) + safetensors (2.4MB) + ONNX (0.5MB)
   12. venv created on GPU server: Python 3.11, torch 2.11.0+cu128, 8x L4 GPUs
-  13. 43/43 tests pass (including 6 CUDA integration tests on GPU)
+  13. 47/47 tests pass (including 10 CUDA integration tests on GPU)
   14. Ruff lint clean, ruff format clean
+  15. TRT FP16 (3.3MB) + TRT FP32 (4.8MB) exported via shared toolkit
+  16. All 5 export formats pushed to HuggingFace: ilessio-aiflowlab/project_manip_ultradex-checkpoint
+  17. Smoke test: 7.2ms latency (batch=1), 8.1ms (batch=32) on NVIDIA L4
+  18. IsaacGym Preview 4 incompatible with py3.11 — using mock sim backend
 - **TODO**:
   1. Materialize UltraDexGrasp-20M dataset generation pipeline using BODex + cuRobo
   2. Wire IsaacGym Preview 4 env for paper-compatible simulation rollout
